@@ -2,6 +2,7 @@ import React, {useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux'
 //Actions de Redux
 import {createNewProductAction} from '../actions/productAction'
+import { showAlert, hideAlertAction } from '../actions/alertAction'
 
 const NewProduct = ({history}) => {
 
@@ -14,22 +15,31 @@ const NewProduct = ({history}) => {
 
     //acceder al state del store
     const load = useSelector( state => state.products.loading)
-    console.log(load)
     const error = useSelector(state => state.products.error)
+    const alert = useSelector(state => state.alert.alert)
+    
     //mandar llamar el action de productAction
     const addProduct = product => dispatch( createNewProductAction(product) )
 
-    
     //cuando el usuario haga submit
     const submitNewProduct = e => {
         e.preventDefault()
 
         //validar formulario
-        if( name.trim() === '' || price <=0 ){
+        if( name.trim() === '' || price <= 0 ){
+            
+            const alert = {
+                msg: 'Ambos campos son obligatorios',
+                classes: 'alert alert-danger text-center text-uppercase p3'
+            }
+            dispatch(showAlert(alert))
+
             return
         }
 
         //si no hay errores
+
+        dispatch(hideAlertAction())
 
         //crear el nuevo producto
         addProduct({
@@ -46,6 +56,9 @@ const NewProduct = ({history}) => {
                 <div className='card'>
                     <div className='card-body'>
                         <h2 className = 'text-center mb-4 font-weight-bold'> Agregar Nuevo Producto </h2>
+                        
+                        {alert ? <p className={alert.classes}>{alert.msg}</p> : null}
+
                         <form
                             onSubmit={submitNewProduct}
                         >
@@ -54,7 +67,7 @@ const NewProduct = ({history}) => {
                                 <input type="text" 
                                         className='form-control' 
                                         placeholder='Nombre Producto'
-                                        name='nombre' 
+                                        name='name' 
                                         value={name}
                                         onChange={e => setName(e.target.value)}
                                 />
@@ -65,7 +78,7 @@ const NewProduct = ({history}) => {
                                 <input type="number"
                                         className='form-control' 
                                         placeholder='Precio Producto'
-                                        name='precio'
+                                        name='price'
                                         value={price}
                                         onChange={e => setPrice(Number(e.target.value))}
                                 />
